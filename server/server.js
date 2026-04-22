@@ -1,6 +1,7 @@
 require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
+const helmet = require('helmet');
 const cookieParser = require('cookie-parser');
 const connectDB = require('./config/db');
 const passport = require('./config/passport');
@@ -10,7 +11,13 @@ const app = express();
 // Connect to MongoDB
 connectDB();
 
+// Trust proxy for production (needed for secure cookies on Render/Vercel)
+if (process.env.NODE_ENV === 'production') {
+  app.set('trust proxy', 1);
+}
+
 // Middleware
+app.use(helmet());
 app.use(cors({
   origin: process.env.CLIENT_URL || 'http://localhost:5173',
   credentials: true,
